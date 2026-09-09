@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+.vscode/
+
+#Dados gerados pelo pipeline
+data/bronze/*.json
+data/silver/*.parquet
+data/gold/*.parquet
