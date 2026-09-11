@@ -17,7 +17,7 @@ def transformar_silver(caminho_bronze):
     
     df["ano"] = df["data_cotacao"].dt.year
     df["mes"] = df["data_cotacao"].dt.month
-    df["day"] = df["data_cotacao"].dt.day
+    df["dia"] = df["data_cotacao"].dt.day
     
     caminho_silver = "data/silver/dolar_historico.parquet"
     

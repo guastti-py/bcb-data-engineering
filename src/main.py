@@ -1,37 +1,55 @@
 from selic.teste_api import extrair_selic
 from selic.transform_silver import transformar_silver
-from selic.transform_gold import transformar_gold
+
 from dolar.extrair_dollar import extrair_dolar
 from dolar.transform_silver import transformar_silver as transformar_silver_dolar
-from dolar.transform_gold import transformar_gold as transformar_gold_dolar
+
+from database.carregar_selic_silver import carregar_selic_silver
+from database.carregar_dolar_silver import carregar_dolar_silver
+
 
 arquivo_bronze, teve_atualizacao = extrair_selic()
 
 if teve_atualizacao:
-    arquivo_silver = transformar_silver(arquivo_bronze)
 
-    arquivo_gold = transformar_gold(arquivo_silver)
-
-    print("Pipeline concluído com sucesso")
-    print(arquivo_gold)
+    arquivo_silver = transformar_silver(
+        arquivo_bronze
+    )
 else:
-    print("Pipeline encerrado: não há novos dados para processar.")
     
+    print("selic sem dados. "
+          "Utilizando a Silver existente."
+    )
+    
+    arquivo_silver = "data/silver/selic_historico.parquet"
+    
+    carregar_selic_silver(
+        arquivo_silver
+    )
+
+    print("Pipeline da Selic concluído até a camada Silver")
+    print(arquivo_silver)
+
+
 arquivo_bronze_dolar, teve_atualizacao_dolar = extrair_dolar()
-    
+
 if teve_atualizacao_dolar:
-    
+
     arquivo_silver_dolar = transformar_silver_dolar(
         arquivo_bronze_dolar
     )
     
-    arquivo_gold_dolar = transformar_gold_dolar(
-        arquivo_silver_dolar
-    )
-    
-    print("Pipeline do Dólar concluído com sucesso")
-    print(arquivo_gold_dolar)
-
 else:
     
-    print("Pipeline do Dólar encerrado: não há novos dados para processar.")
+    print("Dólar sem novos dados. "
+          "Utilizando a Silver existente."
+    )
+    
+    arquivo_silver_dolar = "data/silver/dolar_historico.parquet"
+    
+    carregar_dolar_silver(
+        arquivo_silver_dolar
+    )
+
+    print("Pipeline do Dólar concluído até a camada Silver")
+    print(arquivo_silver_dolar)
