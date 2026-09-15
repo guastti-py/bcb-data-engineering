@@ -1,54 +1,63 @@
 # 📊 BCB Data Engineering Pipeline
 
-Projeto de Engenharia de Dados desenvolvido para estudo e portfólio utilizando dados públicos do **Banco Central do Brasil**.
+Pipeline de Engenharia de Dados desenvolvido com **Python, PostgreSQL e dados públicos do Banco Central do Brasil**.
 
-O pipeline coleta dados da **Taxa Selic** e do **Dólar PTAX**, realiza tratamento em Python, armazena os dados em PostgreSQL e disponibiliza uma camada analítica em SQL.
+O projeto coleta dados históricos da **Taxa Selic** e do **Dólar PTAX**, realiza tratamento e padronização dos dados e disponibiliza uma camada analítica no PostgreSQL.
+
+---
+
+## 🎯 Objetivo
+
+O objetivo deste projeto foi praticar os principais fundamentos de um pipeline de Engenharia de Dados:
+
+- consumo de APIs;
+- extração incremental;
+- transformação de dados;
+- armazenamento em JSON e Parquet;
+- carga em banco de dados;
+- modelagem em camadas Bronze, Silver e Gold;
+- SQL para criação de indicadores;
+- versionamento com Git e GitHub.
 
 ---
 
 ## 🏗️ Arquitetura
 
-O projeto utiliza uma arquitetura em camadas inspirada no modelo **Medallion**:
-
 ```text
 Banco Central do Brasil
           ↓
-         APIs
+        APIs
           ↓
-        Python
+       Python
           ↓
    Bronze - JSON
           ↓
   Silver - Parquet
           ↓
-      PostgreSQL
+     PostgreSQL
           ↓
-     Gold - Views
+    Gold - SQL Views
 ```
 
-### Bronze
+### 🥉 Bronze
 
-Armazena os dados obtidos diretamente das APIs.
+Armazena os dados obtidos das APIs em seu formato mais próximo da origem.
 
 ```text
-data/bronze/selic_historico.json
-data/bronze/dolar_historico.json
+data/bronze/
 ```
 
-A extração é incremental, buscando apenas dados posteriores à última data armazenada.
+### 🥈 Silver
 
-### Silver
+Realiza limpeza, conversão de tipos e padronização dos dados.
 
-Realiza limpeza, padronização e tipagem dos dados.
+Os arquivos tratados são armazenados em formato **Parquet**.
 
 ```text
-data/silver/selic_historico.parquet
-data/silver/dolar_historico.parquet
+data/silver/
 ```
 
-Os dados são armazenados em **Parquet** antes de serem carregados no PostgreSQL.
-
-### Gold
+### 🥇 Gold
 
 A camada analítica é construída diretamente no PostgreSQL através de Views.
 
@@ -58,41 +67,33 @@ dolar_gold
 indicadores_gold
 ```
 
-As Views calculam indicadores mensais como média, mínimo, máximo, primeiro e último valor e variação.
+São calculados indicadores mensais como:
 
-A `indicadores_gold` reúne Selic e Dólar por ano e mês.
+- média;
+- mínimo;
+- máximo;
+- primeiro valor do mês;
+- último valor do mês;
+- quantidade de registros;
+- variação mensal.
+
+A `indicadores_gold` consolida Selic e Dólar por ano e mês.
 
 ---
 
-## 🔄 Pipeline
+## 🔄 Carga incremental
 
-O arquivo:
+O pipeline verifica a última data já armazenada antes de consultar novamente as APIs.
 
-```text
-src/main.py
-```
+Dessa forma, apenas novos dados são buscados.
 
-orquestra o processo:
-
-```text
-API
- ↓
-Bronze
- ↓
-Silver
- ↓
-PostgreSQL
- ↓
-Gold
-```
-
-As cargas no PostgreSQL utilizam:
+Na carga para o PostgreSQL é utilizado:
 
 ```sql
 ON CONFLICT (...) DO NOTHING
 ```
 
-permitindo executar o pipeline várias vezes sem duplicar registros.
+evitando registros duplicados.
 
 ---
 
@@ -115,6 +116,7 @@ bcb-data-engineering/
 │   ├── selic/
 │   └── main.py
 │
+├── .env.example
 ├── .gitignore
 ├── README.md
 └── requirements.txt
@@ -124,20 +126,13 @@ bcb-data-engineering/
 
 ## 🛠️ Tecnologias
 
-- Python
-- Pandas
-- Requests
-- PyArrow
-- PostgreSQL
-- SQL
-- Psycopg
-- Git
+`Python` • `Pandas` • `Requests` • `PyArrow` • `PostgreSQL` • `SQL` • `Psycopg` • `Git` • `GitHub`
 
 ---
 
 ## 🚀 Executando o projeto
 
-Crie e ative o ambiente virtual:
+Crie o ambiente virtual:
 
 ```powershell
 python -m venv .venv
@@ -150,30 +145,16 @@ Instale as dependências:
 python -m pip install -r requirements.txt
 ```
 
-Crie o banco:
+Crie um arquivo `.env` utilizando o `.env.example` como referência.
 
-```text
-bcb_data_engineering
-```
-
-Execute no PostgreSQL:
+No PostgreSQL, execute:
 
 ```text
 sql/01_create_tables.sql
 sql/02_create_views.sql
 ```
 
-Crie um arquivo `.env` na raiz:
-
-```env
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=bcb_data_engineering
-DB_USER=postgres
-DB_PASSWORD=SUA_SENHA
-```
-
-Execute o pipeline:
+Depois execute:
 
 ```powershell
 python src\main.py
@@ -186,25 +167,26 @@ python src\main.py
 Dados públicos disponibilizados pelo **Banco Central do Brasil**.
 
 **Selic:** SGS - Série 1178  
-**Dólar:** PTAX - `CotacaoDolarPeriodo`
+**Dólar:** PTAX
 
 ---
 
 ## 📌 Status
 
-🟡 Projeto em desenvolvimento.
+✅ Pipeline local funcionando.
 
-Atualmente o pipeline local possui:
+Próximas evoluções planejadas:
 
 ```text
-Extração incremental
-Bronze
-Silver
-Parquet
-PostgreSQL
-Gold em SQL
-Controle de duplicidade
-Versionamento com Git
+Orquestração
+AWS
+Automação em nuvem
 ```
 
-Próxima etapa: evolução do projeto e posterior implementação em **AWS**.
+---
+
+## 📚 Sobre o projeto
+
+Este projeto faz parte do meu processo de aprendizado e transição para a área de **Dados / Engenharia de Dados**.
+
+O foco foi construir o pipeline passo a passo e entender a responsabilidade de cada camada e tecnologia utilizada.
