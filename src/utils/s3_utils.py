@@ -11,7 +11,7 @@ def enviar_para_s3(caminho_local, chave_s3):
     if not bucket:
         raise ValueError("A variável S3_BUCKET não foi configurada.")
     
-    s3 = boto3.cliente("s3")
+    s3 = boto3.client("s3")
     
     s3.upload_file(
         caminho_local,
