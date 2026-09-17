@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS seic_silver (
+CREATE TABLE IF NOT EXISTS selic_silver (
 
 data_referencia DATE PRIMARY KEY,
 selic_anual DOUBLE PRECISION,
