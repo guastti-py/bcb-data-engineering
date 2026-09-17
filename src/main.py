@@ -7,12 +7,19 @@ from dolar.transform_silver import transformar_silver as transformar_silver_dola
 from database.carregar_selic_silver import carregar_selic_silver
 from database.carregar_dolar_silver import carregar_dolar_silver
 
+from utils.s3_utils import enviar_para_s3
+
 
 # =========================
 # SELIC
 # =========================
 
 arquivo_bronze, teve_atualizacao = extrair_selic()
+
+enviar_para_s3(
+    arquivo_bronze,
+    "bronze/selic/selic_historico.json"
+)
 
 if teve_atualizacao:
 
@@ -29,6 +36,10 @@ else:
 
     arquivo_silver = "data/silver/selic_historico.parquet"
 
+enviar_para_s3(
+    arquivo_silver,
+    "silver/selic/selic_historico.parquet"
+)
 
 carregar_selic_silver(
     arquivo_silver
