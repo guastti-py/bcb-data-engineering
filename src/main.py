@@ -55,6 +55,11 @@ print(arquivo_silver)
 
 arquivo_bronze_dolar, teve_atualizacao_dolar = extrair_dolar()
 
+enviar_para_s3(
+    arquivo_bronze_dolar,
+    "bronze/dolar/dolar_historico.json"
+)
+
 if teve_atualizacao_dolar:
 
     arquivo_silver_dolar = transformar_silver_dolar(
@@ -67,8 +72,13 @@ else:
         "Dólar sem novos dados. "
         "Utilizando a Silver existente."
     )
-
+    
     arquivo_silver_dolar = "data/silver/dolar_historico.parquet"
+    
+enviar_para_s3(
+    arquivo_silver_dolar,
+    "silver/dolar/dolar_historico.parquet"
+)
 
 
 carregar_dolar_silver(
